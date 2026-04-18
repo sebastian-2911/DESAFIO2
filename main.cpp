@@ -1,9 +1,10 @@
-#include <iostream>
+#include "torneo.h"
 
-using namespace std;
+int main() {
+    Torneo t;
 
-int main()
-{
-    cout << "Hello World!" << endl;
+    t.cargarEquipos("fifa.csv");
+    t.mostrarEquipos();
+
     return 0;
 }

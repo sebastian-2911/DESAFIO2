@@ -1,10 +1,21 @@
 #ifndef JUGADOR_H
 #define JUGADOR_H
 
-class jugador
-{
+#include <string>
+using namespace std;
+
+class Jugador {
 public:
-    jugador();
+    string nombre;
+    string apellido;
+    int numero;
+
+    int goles;
+    int amarillas;
+    int rojas;
+    int minutos;
+
+    Jugador();
 };
 
-#endif // JUGADOR_H
+#endif

@@ -4,7 +4,7 @@
 
 using namespace std;
 
-//  convierte string a int (sin stoi)
+// convertir string a int sin stoi
 int convertirEntero(string texto) {
     int num = 0;
 
@@ -19,29 +19,29 @@ int convertirEntero(string texto) {
     return num;
 }
 
-// Constructor
+// constructor
 Torneo::Torneo() {
     cantidad = 0;
-    equipos = new Equipo[48]; // memoria dinámica
+    equipos = new Equipo[47];//ya q comienza en 0
 }
 
-//  Destructor
+// destructor
 Torneo::~Torneo() {
     delete[] equipos;
 }
 
-//  Cargar equipos desde CSV
+// cargar desde CSV
 void Torneo::cargarEquipos(string nombreArchivo) {
     ifstream archivo(nombreArchivo);
 
     if (!archivo) {
-        cout << "Error al abrir el archivo" << endl;
+        cout << "Error al abrir archivo" << endl;
         return;
     }
 
     string linea;
 
-    // Saltar encabezados
+    // saltar encabezados
     getline(archivo, linea);
     getline(archivo, linea);
 
@@ -49,49 +49,55 @@ void Torneo::cargarEquipos(string nombreArchivo) {
 
         Equipo e;
 
-        string ranking, pais, tecnico, federacion, confederacion;
+        string pais, tecnico;
         string golesF_str, golesC_str, ganados_str, empatados_str, perdidos_str;
 
         int inicio = 0;
         int pos;
 
-
+        // saltar ranking
         pos = linea.find(";", inicio);
-        ranking = linea.substr(inicio, pos - inicio);
         inicio = pos + 1;
 
+        // pais
         pos = linea.find(";", inicio);
         pais = linea.substr(inicio, pos - inicio);
         inicio = pos + 1;
 
+        // tecnico
         pos = linea.find(";", inicio);
         tecnico = linea.substr(inicio, pos - inicio);
         inicio = pos + 1;
 
+        // saltar federacion
         pos = linea.find(";", inicio);
-        federacion = linea.substr(inicio, pos - inicio);
         inicio = pos + 1;
 
+        // saltar confederacion
         pos = linea.find(";", inicio);
-        confederacion = linea.substr(inicio, pos - inicio);
         inicio = pos + 1;
 
+        // golesF
         pos = linea.find(";", inicio);
         golesF_str = linea.substr(inicio, pos - inicio);
         inicio = pos + 1;
 
+        // golesC
         pos = linea.find(";", inicio);
         golesC_str = linea.substr(inicio, pos - inicio);
         inicio = pos + 1;
 
+        // ganados
         pos = linea.find(";", inicio);
         ganados_str = linea.substr(inicio, pos - inicio);
         inicio = pos + 1;
 
+        // empatados
         pos = linea.find(";", inicio);
         empatados_str = linea.substr(inicio, pos - inicio);
         inicio = pos + 1;
 
+        // perdidos
         perdidos_str = linea.substr(inicio);
 
         // convertir a int
@@ -105,7 +111,7 @@ void Torneo::cargarEquipos(string nombreArchivo) {
         e.pais = pais;
         e.tecnico = tecnico;
 
-        //  guardar en arreglo
+        // guardar en arreglo
         if (cantidad < 48) {
             equipos[cantidad] = e;
             cantidad++;
@@ -115,7 +121,7 @@ void Torneo::cargarEquipos(string nombreArchivo) {
     archivo.close();
 }
 
-//  Mostrar equipos
+// mostrar equipos
 void Torneo::mostrarEquipos() {
     for (int i = 0; i < cantidad; i++) {
         cout << equipos[i].pais

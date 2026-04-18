@@ -3,17 +3,16 @@
 
 #include <string>
 #include "equipo.h"
-
 using namespace std;
 
 class Torneo {
 private:
-    Equipo* equipos;   // arreglo dinámico
-    int cantidad;      // cuántos equipos hay
+    Equipo* equipos;
+    int cantidad;
 
 public:
-    Torneo();          // constructor
-    ~Torneo();         // destructor
+    Torneo();
+    ~Torneo();
 
     void cargarEquipos(string nombreArchivo);
     void mostrarEquipos();
