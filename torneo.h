@@ -1,8 +1,9 @@
 #ifndef TORNEO_H
 #define TORNEO_H
 
-#include <string>
 #include "equipo.h"
+#include <string>
+
 using namespace std;
 
 class Torneo {
@@ -15,7 +16,10 @@ public:
     ~Torneo();
 
     void cargarEquipos(string nombreArchivo);
-    void mostrarEquipos();
+
+
+    Equipo* getEquipos();
+    int getCantidad();
 };
 
 #endif

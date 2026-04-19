@@ -1,10 +1,18 @@
 #ifndef FASE_H
 #define FASE_H
 
-class fase
-{
+#include "grupo.h"
+#include "equipo.h"
+
+class Fase {
+private:
+    Grupo grupos;
+
 public:
-    fase();
+    Fase();
+
+    void iniciarFase(Equipo* equipos, int cantidad);
+    void mostrar();
 };
 
-#endif // FASE_H
+#endif

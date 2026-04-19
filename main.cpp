@@ -1,10 +1,15 @@
 #include "torneo.h"
+#include "fase.h"
 
 int main() {
-    Torneo t;
 
+    Torneo t;
     t.cargarEquipos("fifa.csv");
-    t.mostrarEquipos();
+
+    Fase f;
+
+    f.iniciarFase(t.getEquipos(), t.getCantidad());
+    f.mostrar();
 
     return 0;
 }
