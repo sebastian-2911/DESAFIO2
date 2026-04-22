@@ -2,7 +2,7 @@
 #define JUGADOR_H
 
 #include <string>
-using namespace std;
+using std::string;
 
 class Jugador {
 public:
@@ -15,7 +15,7 @@ public:
     int rojas;
     int minutos;
 
-    Jugador();
+    Jugador();  // constructor
 };
 
 #endif

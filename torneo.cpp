@@ -1,14 +1,20 @@
 #include "torneo.h"
+#include "Equipo.h"
+#include "Jugador.h"
 #include <iostream>
 #include <fstream>
 
 using namespace std;
 
-// convertir string a int sin stoi
 int convertirEntero(string texto) {
     int num = 0;
+    int i = 0;
 
-    for (int i = 0; i < texto.length(); i++) {
+    while (i < texto.length() && texto[i] == ' ') {
+        i++;
+    }
+
+    for (; i < texto.length(); i++) {
         if (texto[i] >= '0' && texto[i] <= '9') {
             num = num * 10 + (texto[i] - '0');
         } else {
@@ -19,117 +25,159 @@ int convertirEntero(string texto) {
     return num;
 }
 
-// Constructor
 Torneo::Torneo() {
-    cantidad = 0;
     equipos = new Equipo[48];
+    cantidad = 0;
 }
 
-// Destructor
 Torneo::~Torneo() {
     delete[] equipos;
 }
 
-// Cargar equipos desde CSV
 void Torneo::cargarEquipos(string nombreArchivo) {
     ifstream archivo(nombreArchivo);
+    string linea;
 
-    if (!archivo) {
-        cout << "Error al abrir archivo" << endl;
+    if (!archivo.is_open()) {
+        cout << "Error al abrir el archivo: " << nombreArchivo << endl;
         return;
     }
 
-    string linea;
+    cantidad = 0;
 
-    // Saltar encabezados
     getline(archivo, linea);
     getline(archivo, linea);
 
     while (getline(archivo, linea) && cantidad < 48) {
 
-        Equipo e;
+        if (linea == "") {
+            continue;
+        }
 
-        string pais, tecnico;
-        string golesF_str, golesC_str, ganados_str, empatados_str, perdidos_str;
-
+        string c[10];
+        int indiceColumna = 0;
         int inicio = 0;
-        int pos;
+        int pos = 0;
 
-        // ranking (ignorar)
-        pos = linea.find(";", inicio);
-        if (pos == -1) continue;
-        inicio = pos + 1;
+        while ((pos = linea.find(";", inicio)) != string::npos && indiceColumna < 9) {
+            c[indiceColumna] = linea.substr(inicio, pos - inicio);
+            indiceColumna++;
+            inicio = pos + 1;
+        }
 
-        // pais
-        pos = linea.find(";", inicio);
-        if (pos == -1) continue;
-        pais = linea.substr(inicio, pos - inicio);
-        inicio = pos + 1;
+        c[indiceColumna] = linea.substr(inicio);
 
-        // tecnico
-        pos = linea.find(";", inicio);
-        if (pos == -1) continue;
-        tecnico = linea.substr(inicio, pos - inicio);
-        inicio = pos + 1;
+        if (indiceColumna < 9) {
+            cout << "Linea invalida: " << linea << endl;
+            continue;
+        }
 
-        // federacion (ignorar)
-        pos = linea.find(";", inicio);
-        if (pos == -1) continue;
-        inicio = pos + 1;
+        Equipo& e = equipos[cantidad];
 
-        // confederacion (ignorar)
-        pos = linea.find(";", inicio);
-        if (pos == -1) continue;
-        inicio = pos + 1;
+        e.rankingFIFA = convertirEntero(c[0]);
+        e.pais = c[1];
+        e.tecnico = c[2];
+        e.confederacion = c[4];
 
-        // golesF
-        pos = linea.find(";", inicio);
-        if (pos == -1) continue;
-        golesF_str = linea.substr(inicio, pos - inicio);
-        inicio = pos + 1;
+        e.historico.golesF = convertirEntero(c[5]);
+        e.historico.golesC = convertirEntero(c[6]);
+        e.historico.ganados = convertirEntero(c[7]);
+        e.historico.empatados = convertirEntero(c[8]);
+        e.historico.perdidos = convertirEntero(c[9]);
 
-        // golesC
-        pos = linea.find(";", inicio);
-        if (pos == -1) continue;
-        golesC_str = linea.substr(inicio, pos - inicio);
-        inicio = pos + 1;
+        e.reiniciarActual();
 
-        // ganados
-        pos = linea.find(";", inicio);
-        if (pos == -1) continue;
-        ganados_str = linea.substr(inicio, pos - inicio);
-        inicio = pos + 1;
-
-        // empatados
-        pos = linea.find(";", inicio);
-        if (pos == -1) continue;
-        empatados_str = linea.substr(inicio, pos - inicio);
-        inicio = pos + 1;
-
-        // perdidos
-        perdidos_str = linea.substr(inicio);
-
-        // convertir a int
-        e.golesF = convertirEntero(golesF_str);
-        e.golesC = convertirEntero(golesC_str);
-        e.ganados = convertirEntero(ganados_str);
-        e.empatados = convertirEntero(empatados_str);
-        e.perdidos = convertirEntero(perdidos_str);
-
-        // guardar datos
-        e.pais = pais;
-        e.tecnico = tecnico;
-
-        // guardar en arreglo
-        equipos[cantidad] = e;
         cantidad++;
     }
 
     archivo.close();
+
+    cout << "Equipos cargados: " << cantidad << endl;
 }
 
+void Torneo::mostrarTodo() {
+    cout << "\n====== EQUIPOS DEL TORNEO ======\n";
 
+    for (int i = 0; i < cantidad; i++) {
+        Equipo& e = equipos[i];
 
+        int puntosActuales = e.actual.ganados * 3 + e.actual.empatados;
+        int puntosHistoricos = e.historico.ganados * 3 + e.historico.empatados;
+        int partidosHistoricos = e.historico.ganados + e.historico.empatados + e.historico.perdidos;
+
+        cout << "\n" << i + 1 << ". " << e.pais << endl;
+        cout << "-------------------------" << endl;
+        cout << "Confederacion: " << e.confederacion << endl;
+        cout << "Tecnico: " << e.tecnico << endl;
+        cout << "Ranking FIFA: " << e.rankingFIFA << endl;
+
+        cout << "\nACTUAL (TORNEO)" << endl;
+        cout << "Puntos: " << puntosActuales << endl;
+        cout << "GF: " << e.actual.golesF << " | GC: " << e.actual.golesC << endl;
+        cout << "G: " << e.actual.ganados
+             << " | E: " << e.actual.empatados
+             << " | P: " << e.actual.perdidos << endl;
+
+        cout << "\nHISTORICO" << endl;
+        cout << "Puntos: " << puntosHistoricos << endl;
+        cout << "Partidos: " << partidosHistoricos << endl;
+        cout << "GF: " << e.historico.golesF << " | GC: " << e.historico.golesC << endl;
+        cout << "G: " << e.historico.ganados
+             << " | E: " << e.historico.empatados
+             << " | P: " << e.historico.perdidos << endl;
+    }
+
+    cout << endl;
+}
+
+void Torneo::mostrarEstadisticasEquipos() {
+    cout << "\n====== ESTADISTICAS DE EQUIPOS ======\n";
+
+    for (int i = 0; i < cantidad; i++) {
+        Equipo& e = equipos[i];
+
+        int puntos = e.actual.ganados * 3 + e.actual.empatados;
+        int diferencia = e.actual.golesF - e.actual.golesC;
+        int partidos = e.actual.ganados + e.actual.empatados + e.actual.perdidos;
+
+        cout << "\n" << e.pais << endl;
+        cout << "-------------------------" << endl;
+        cout << "Confederacion: " << e.confederacion << endl;
+        cout << "Partidos: " << partidos << endl;
+        cout << "Puntos: " << puntos << endl;
+        cout << "GF: " << e.actual.golesF << endl;
+        cout << "GC: " << e.actual.golesC << endl;
+        cout << "DG: " << diferencia << endl;
+        cout << "Ganados: " << e.actual.ganados << endl;
+        cout << "Empatados: " << e.actual.empatados << endl;
+        cout << "Perdidos: " << e.actual.perdidos << endl;
+    }
+
+    cout << endl;
+}
+
+void Torneo::mostrarEstadisticasJugadores() {
+    cout << "\n====== ESTADISTICAS DE JUGADORES ======\n";
+
+    for (int i = 0; i < cantidad; i++) {
+        Equipo& e = equipos[i];
+
+        cout << "\nEquipo: " << e.pais << endl;
+        cout << "-------------------------" << endl;
+
+        for (int j = 0; j < 26; j++) {
+            cout << e.jugadores[j].nombre << " " << e.jugadores[j].apellido
+                 << " | N: " << e.jugadores[j].numero
+                 << " | Goles: " << e.jugadores[j].goles
+                 << " | Amarillas: " << e.jugadores[j].amarillas
+                 << " | Rojas: " << e.jugadores[j].rojas
+                 << " | Min: " << e.jugadores[j].minutos
+                 << endl;
+        }
+    }
+
+    cout << endl;
+}
 
 Equipo* Torneo::getEquipos() {
     return equipos;

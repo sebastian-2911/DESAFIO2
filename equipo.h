@@ -4,26 +4,43 @@
 #include <string>
 #include "jugador.h"
 
-using namespace std;
+using std::string;
 
-class Equipo {
-public:
-    string pais;
-    string tecnico;
-
+// ESTADÍSTICAS
+struct Estadisticas {
     int golesF;
     int golesC;
     int ganados;
     int empatados;
     int perdidos;
 
-    Jugador jugadores[26]; // 26 jugadores por equipo
-    // cada objeto equipo ya tiene 26 jugadores
+    Estadisticas();
+};
+
+// EQUIPO
+class Equipo {
+
+public:
+    string pais;
+    string tecnico;
+    string confederacion;
+    int rankingFIFA;
+
+    Estadisticas historico;
+    Estadisticas actual;
+
+    Jugador jugadores[26];
+
     // Constructor
     Equipo();
 
-    // Inicializar jugadores
+    // Métodos
+    void reiniciarActual();
     void inicializarJugadores();
+    Jugador** obtenerAlineacion();
+
+private:
+    string intAString(int num);
 };
 
 #endif
