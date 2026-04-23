@@ -1,10 +1,18 @@
-#include "Grupo.h"
-#include "Equipo.h"
-#include "Partido.h"
+#include "grupo.h"
+#include "equipo.h"
+#include "partido.h"
+#include <iostream>
+#include <cstdlib>
+
+using namespace std;
 
 // CONSTRUCTOR
 Grupo::Grupo() {
     totalPartidos = 0;
+
+    for (int i = 0; i < 48; i++) {
+        grupos[i] = 0;
+    }
 }
 
 // INTERCAMBIO MANUAL
@@ -24,20 +32,20 @@ void Grupo::barajarBombo(Equipo** bombo, int n) {
 
 // VALIDAR CONFEDERACIONES
 bool Grupo::sePuedeAgregar(Equipo** grupoTemp, int usados, Equipo* candidato) {
-
     int uefa = 0;
 
     for (int i = 0; i < usados; i++) {
-
         if (grupoTemp[i]->confederacion == "UEFA") {
             uefa++;
         }
 
         if (grupoTemp[i]->confederacion == candidato->confederacion) {
-
             if (candidato->confederacion == "UEFA") {
-                if (uefa >= 2) return false;
-            } else {
+                if (uefa >= 2) {
+                    return false;
+                }
+            }
+            else {
                 return false;
             }
         }
@@ -46,13 +54,14 @@ bool Grupo::sePuedeAgregar(Equipo** grupoTemp, int usados, Equipo* candidato) {
     return true;
 }
 
-// CREAR BOMBOS (SIN DAÑAR EL ARREGLO ORIGINAL)
+// CREAR BOMBOS
 void Grupo::crearBombos(Equipo* equipos, int cantidad) {
-
-    int n1 = 0, n2 = 0, n3 = 0, n4 = 0;
+    int n1 = 0;
+    int n2 = 0;
+    int n3 = 0;
+    int n4 = 0;
     bool usaAgregado = false;
 
-    // meter USA primero
     for (int i = 0; i < cantidad; i++) {
         if (equipos[i].pais == "United States") {
             bombo1[n1++] = &equipos[i];
@@ -62,18 +71,22 @@ void Grupo::crearBombos(Equipo* equipos, int cantidad) {
     }
 
     for (int i = 0; i < cantidad; i++) {
-
-        if (usaAgregado && equipos[i].pais == "United States")
+        if (usaAgregado && equipos[i].pais == "United States") {
             continue;
+        }
 
-        if (n1 < 12)
+        if (n1 < 12) {
             bombo1[n1++] = &equipos[i];
-        else if (n2 < 12)
+        }
+        else if (n2 < 12) {
             bombo2[n2++] = &equipos[i];
-        else if (n3 < 12)
+        }
+        else if (n3 < 12) {
             bombo3[n3++] = &equipos[i];
-        else if (n4 < 12)
+        }
+        else if (n4 < 12) {
             bombo4[n4++] = &equipos[i];
+        }
     }
 }
 
@@ -81,21 +94,34 @@ void Grupo::crearBombos(Equipo* equipos, int cantidad) {
 bool Grupo::armarGruposRecursivo(int grupoActual, int bomboActual,
                                  bool usados1[], bool usados2[],
                                  bool usados3[], bool usados4[]) {
-
-    if (grupoActual == 12)
+    if (grupoActual == 12) {
         return true;
+    }
 
-    if (bomboActual == 4)
+    if (bomboActual == 4) {
         return armarGruposRecursivo(grupoActual + 1, 0,
                                     usados1, usados2, usados3, usados4);
+    }
 
     Equipo** bombo = 0;
     bool* usados = 0;
 
-    if (bomboActual == 0) { bombo = bombo1; usados = usados1; }
-    else if (bomboActual == 1) { bombo = bombo2; usados = usados2; }
-    else if (bomboActual == 2) { bombo = bombo3; usados = usados3; }
-    else { bombo = bombo4; usados = usados4; }
+    if (bomboActual == 0) {
+        bombo = bombo1;
+        usados = usados1;
+    }
+    else if (bomboActual == 1) {
+        bombo = bombo2;
+        usados = usados2;
+    }
+    else if (bomboActual == 2) {
+        bombo = bombo3;
+        usados = usados3;
+    }
+    else {
+        bombo = bombo4;
+        usados = usados4;
+    }
 
     int base = grupoActual * 4;
 
@@ -105,17 +131,15 @@ bool Grupo::armarGruposRecursivo(int grupoActual, int bomboActual,
     }
 
     for (int i = 0; i < 12; i++) {
-
         if (!usados[i]) {
-
             if (sePuedeAgregar(grupoTemp, bomboActual, bombo[i])) {
-
                 grupos[base + bomboActual] = bombo[i];
                 usados[i] = true;
 
                 if (armarGruposRecursivo(grupoActual, bomboActual + 1,
-                                         usados1, usados2, usados3, usados4))
+                                         usados1, usados2, usados3, usados4)) {
                     return true;
+                }
 
                 usados[i] = false;
                 grupos[base + bomboActual] = 0;
@@ -128,7 +152,6 @@ bool Grupo::armarGruposRecursivo(int grupoActual, int bomboActual,
 
 // CREAR GRUPOS
 void Grupo::crearGrupos(Equipo* equipos, int cantidad) {
-
     crearBombos(equipos, cantidad);
 
     barajarBombo(bombo1, 12);
@@ -136,33 +159,57 @@ void Grupo::crearGrupos(Equipo* equipos, int cantidad) {
     barajarBombo(bombo3, 12);
     barajarBombo(bombo4, 12);
 
-    for (int i = 0; i < 48; i++)
+    for (int i = 0; i < 48; i++) {
         grupos[i] = 0;
+    }
 
-    bool usados1[12] = {false};
-    bool usados2[12] = {false};
-    bool usados3[12] = {false};
-    bool usados4[12] = {false};
+    bool usados1[12] = { false };
+    bool usados2[12] = { false };
+    bool usados3[12] = { false };
+    bool usados4[12] = { false };
 
-    bool ok = armarGruposRecursivo(0, 0,
-                                   usados1, usados2,
-                                   usados3, usados4);
+    bool ok = armarGruposRecursivo(0, 0, usados1, usados2, usados3, usados4);
 
     if (!ok) {
-        cout << "Error: no se pudieron generar grupos validos\n";
+        cout << "Error: no se pudieron generar grupos validos" << endl;
     }
+}
+
+// CONSTRUIR FECHA DESDE ÍNDICE DE DÍA
+string Grupo::construirFechaDesdeIndice(int dia) const {
+    int diaReal = 20 + dia;
+    int mes = 6;
+
+    if (diaReal > 30) {
+        diaReal -= 30;
+        mes = 7;
+    }
+
+    string fecha = "";
+
+    if (diaReal < 10) {
+        fecha += "0";
+    }
+    fecha += to_string(diaReal);
+
+    fecha += "/";
+
+    if (mes < 10) {
+        fecha += "0";
+    }
+    fecha += to_string(mes);
+
+    fecha += "/2026";
+
+    return fecha;
 }
 
 // CREAR PARTIDOS
 void Grupo::crearPartidos() {
-
-    partidos = new Partido[72];
     totalPartidos = 0;
-
     int dia = 0;
 
     for (int g = 0; g < 12; g++) {
-
         int base = g * 4;
 
         Equipo* e1 = grupos[base + 0];
@@ -180,19 +227,19 @@ void Grupo::crearPartidos() {
         };
 
         for (int i = 0; i < 6; i++) {
-
-            string fecha = to_string(20 + dia) + "/06/2026";
+            string fecha = construirFechaDesdeIndice(dia);
 
             lista[i].configurar(
                 fecha,
                 "00:00",
-                "anastasio",
-                "jorge",
-                "anibal",
-                "pierluigi collina"
+                "nombreSede",
+                "codArbitro1",
+                "codArbitro2",
+                "codArbitro3"
                 );
 
-            partidos[totalPartidos++] = lista[i];
+            partidos[totalPartidos] = lista[i];
+            totalPartidos++;
 
             dia = (dia + 1) % 19;
         }
@@ -201,14 +248,12 @@ void Grupo::crearPartidos() {
 
 // JUGAR DÍA
 void Grupo::jugarDia(string fecha) {
-
-    cout << "PARTIDOS DEL DIA" << endl;
+    cout << "\nPARTIDOS DEL DIA" << endl;
     cout << "----------------" << endl;
 
     bool huboPartidos = false;
 
     for (int i = 0; i < totalPartidos; i++) {
-
         if (partidos[i].getFecha() == fecha) {
             partidos[i].jugar();
             partidos[i].mostrarDetalle();
@@ -223,28 +268,38 @@ void Grupo::jugarDia(string fecha) {
     cout << endl;
 }
 
+// REVISAR SI YA SE JUGARON TODOS LOS PARTIDOS
+bool Grupo::todosLosPartidosJugados() const {
+    for (int i = 0; i < totalPartidos; i++) {
+        if (!partidos[i].yaSeJugo()) {
+            return false;
+        }
+    }
+    return true;
+}
 // COMPARADOR TABLA
 bool Grupo::vaAntes(Equipo* a, Equipo* b) {
-
     int ptsA = a->actual.ganados * 3 + a->actual.empatados;
     int ptsB = b->actual.ganados * 3 + b->actual.empatados;
 
-    if (ptsA != ptsB) return ptsA > ptsB;
+    if (ptsA != ptsB) {
+        return ptsA > ptsB;
+    }
 
     int diffA = a->actual.golesF - a->actual.golesC;
     int diffB = b->actual.golesF - b->actual.golesC;
 
-    if (diffA != diffB) return diffA > diffB;
+    if (diffA != diffB) {
+        return diffA > diffB;
+    }
 
     return a->actual.golesF > b->actual.golesF;
 }
 
 // ORDENAR GRUPO
 void Grupo::ordenarGrupo(int inicio) {
-
     for (int i = inicio; i < inicio + 4; i++) {
         for (int j = i + 1; j < inicio + 4; j++) {
-
             if (!vaAntes(grupos[i], grupos[j])) {
                 intercambiar(grupos[i], grupos[j]);
             }
@@ -252,13 +307,23 @@ void Grupo::ordenarGrupo(int inicio) {
     }
 }
 
+// OBTENER GRUPOS ORDENADOS
+void Grupo::obtenerGruposOrdenados(Equipo* destino[48]) {
+    for (int g = 0; g < 12; g++) {
+        int inicio = g * 4;
+        ordenarGrupo(inicio);
+
+        for (int i = 0; i < 4; i++) {
+            destino[inicio + i] = grupos[inicio + i];
+        }
+    }
+}
+
 // MOSTRAR GRUPOS
 void Grupo::mostrarGrupos() {
-
     char letra = 'A';
 
     for (int i = 0; i < 12; i++) {
-
         int inicio = i * 4;
 
         ordenarGrupo(inicio);
@@ -266,9 +331,7 @@ void Grupo::mostrarGrupos() {
         cout << "Grupo " << letra << endl;
 
         for (int j = 0; j < 4; j++) {
-
             Equipo* e = grupos[inicio + j];
-
             int puntos = e->actual.ganados * 3 + e->actual.empatados;
 
             cout << e->pais

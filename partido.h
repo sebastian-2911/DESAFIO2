@@ -42,38 +42,42 @@ private:
 
     bool jugado;
 
-    int poisson(float lambda);
-    float calcularLambda(Equipo* ataque, Equipo* defensa);
-    int limitarEntero(int valor, int minimo, int maximo);
+    void reset();
+    int limitarEntero(int valor, int minimo, int maximo) const;
+    int poisson(float lambda) const;
+    float calcularLambda(Equipo* ataque, Equipo* defensa) const;
 
 public:
     Partido();
     Partido(Equipo* local, Equipo* visitante);
 
-    void configurar(string fechaPartido,
-                    string horaPartido,
-                    string nombreSede,
-                    string arb1,
-                    string arb2,
-                    string arb3);
+    void configurar(const string& fechaPartido,
+                    const string& horaPartido,
+                    const string& nombreSede,
+                    const string& arb1,
+                    const string& arb2,
+                    const string& arb3);
 
     void jugar();
-    void mostrar();
-    void mostrarDetalle();
 
-    string getFecha();
-    string getHora();
+    void mostrar() const;
+    void mostrarDetalle() const;
 
-    Equipo* getEquipoLocal();
-    Equipo* getEquipoVisitante();
+    string getFecha() const;
+    string getHora() const;
 
-    int getGolesLocal();
-    int getGolesVisitante();
+    Equipo* getEquipoLocal() const;
+    Equipo* getEquipoVisitante() const;
 
-    int getPosesionLocal();
-    int getPosesionVisitante();
+    int getGolesLocal() const;
+    int getGolesVisitante() const;
 
-    bool yaSeJugo();
+    int getPosesionLocal() const;
+    int getPosesionVisitante() const;
+
+    bool yaSeJugo() const;
 };
 
 #endif
+
+

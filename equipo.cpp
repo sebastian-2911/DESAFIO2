@@ -1,26 +1,24 @@
 #include "equipo.h"
 #include <cstdlib>
 
-// STADÍSTICAS
-Estadisticas::Estadisticas() {
-    golesF = 0;
-    golesC = 0;
-    ganados = 0;
-    empatados = 0;
-    perdidos = 0;
+// ESTADISTICAS
+Estadisticas::Estadisticas()
+    : golesF(0), golesC(0), ganados(0), empatados(0), perdidos(0) {
 }
 
-// CONSTRUCTOR
-Equipo::Equipo() {
-    pais = "";
-    tecnico = "";
-    confederacion = "";
-    rankingFIFA = 0;
-
-    historico = Estadisticas();
-    actual = Estadisticas();
-
+//  CONSTRUCTOR
+Equipo::Equipo()
+    : pais(""),
+    tecnico(""),
+    confederacion(""),
+    rankingFIFA(0),
+    historico(),
+    actual() {
     inicializarJugadores();
+
+    for (int i = 0; i < 11; i++) {
+        alineacion[i] = 0;
+    }
 }
 
 //  RESET TORNEO
@@ -29,15 +27,20 @@ void Equipo::reiniciarActual() {
 }
 
 // JUGADORES
-void Equipo::inicializarJugadores() {
+#include <sstream>
 
+void Equipo::inicializarJugadores() {
     for (int i = 0; i < 26; i++) {
 
-        int num = i + 1;
+        stringstream ss1;
+        stringstream ss2;
 
-        jugadores[i].nombre = "Jugador";
-        jugadores[i].apellido = "Apellido";
-        jugadores[i].numero = num;
+        ss1 << "Jugador" << (i + 1);
+        ss2 << "Apellido" << (i + 1);
+
+        jugadores[i].nombre = ss1.str();
+        jugadores[i].apellido = ss2.str();
+        jugadores[i].numero = i + 1;
 
         jugadores[i].goles = 0;
         jugadores[i].amarillas = 0;
@@ -45,16 +48,11 @@ void Equipo::inicializarJugadores() {
         jugadores[i].minutos = 0;
     }
 }
-
-//ALINEACIÓN
+//ALINEACION
 Jugador** Equipo::obtenerAlineacion() {
-
-    Jugador** alineacion = new Jugador*[11];
-
-    bool usados[26] = { false };
+    bool usados[26] = {false};
 
     for (int i = 0; i < 11; i++) {
-
         int indice;
 
         do {
@@ -62,7 +60,6 @@ Jugador** Equipo::obtenerAlineacion() {
         } while (usados[indice]);
 
         usados[indice] = true;
-
         alineacion[i] = &jugadores[indice];
     }
 

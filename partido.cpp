@@ -11,10 +11,7 @@ const float MU   = 1.35f;
 const float ALFA = 0.4f;
 const float BETA = 0.6f;
 
-Partido::Partido() {
-    equipoLocal = 0;
-    equipoVisitante = 0;
-
+void Partido::reset() {
     sede = "";
     arbitro1 = "";
     arbitro2 = "";
@@ -24,69 +21,40 @@ Partido::Partido() {
 
     golesLocal = 0;
     golesVisitante = 0;
-
     posesionLocal = 0;
     posesionVisitante = 0;
-
     tirosLocal = 0;
     tirosVisitante = 0;
-
     tirosArcoLocal = 0;
     tirosArcoVisitante = 0;
-
     faltasLocal = 0;
     faltasVisitante = 0;
-
     amarillasLocal = 0;
     amarillasVisitante = 0;
-
     rojasLocal = 0;
     rojasVisitante = 0;
 
     jugado = false;
+}
+
+Partido::Partido() {
+    equipoLocal = 0;
+    equipoVisitante = 0;
+    reset();
 }
 
 Partido::Partido(Equipo* local, Equipo* visitante) {
     equipoLocal = local;
     equipoVisitante = visitante;
-
-    sede = "";
-    arbitro1 = "";
-    arbitro2 = "";
-    arbitro3 = "";
-    fecha = "";
-    hora = "";
-
-    golesLocal = 0;
-    golesVisitante = 0;
-
-    posesionLocal = 0;
-    posesionVisitante = 0;
-
-    tirosLocal = 0;
-    tirosVisitante = 0;
-
-    tirosArcoLocal = 0;
-    tirosArcoVisitante = 0;
-
-    faltasLocal = 0;
-    faltasVisitante = 0;
-
-    amarillasLocal = 0;
-    amarillasVisitante = 0;
-
-    rojasLocal = 0;
-    rojasVisitante = 0;
-
-    jugado = false;
+    reset();
 }
 
-void Partido::configurar(string fechaPartido,
-                         string horaPartido,
-                         string nombreSede,
-                         string arb1,
-                         string arb2,
-                         string arb3) {
+void Partido::configurar(const string& fechaPartido,
+                         const string& horaPartido,
+                         const string& nombreSede,
+                         const string& arb1,
+                         const string& arb2,
+                         const string& arb3) {
     fecha = fechaPartido;
     hora = horaPartido;
     sede = nombreSede;
@@ -95,13 +63,13 @@ void Partido::configurar(string fechaPartido,
     arbitro3 = arb3;
 }
 
-int Partido::limitarEntero(int valor, int minimo, int maximo) {
+int Partido::limitarEntero(int valor, int minimo, int maximo) const {
     if (valor < minimo) return minimo;
     if (valor > maximo) return maximo;
     return valor;
 }
 
-int Partido::poisson(float lambda) {
+int Partido::poisson(float lambda) const {
     if (lambda <= 0.0f) return 0;
 
     float L = exp(-lambda);
@@ -115,41 +83,47 @@ int Partido::poisson(float lambda) {
 
     return k - 1;
 }
+float Partido::calcularLambda(Equipo* ataque, Equipo* defensa) const {
+    int partidosA = ataque->historico.ganados +
+                    ataque->historico.empatados +
+                    ataque->historico.perdidos;
 
-float Partido::calcularLambda(Equipo* ataque, Equipo* defensa) {
-    int partidosAtaque = ataque->historico.ganados
-                         + ataque->historico.empatados
-                         + ataque->historico.perdidos;
+    int partidosB = defensa->historico.ganados +
+                    defensa->historico.empatados +
+                    defensa->historico.perdidos;
 
-    int partidosDefensa = defensa->historico.ganados
-                          + defensa->historico.empatados
-                          + defensa->historico.perdidos;
+    float gf = MU;
+    float gc = MU;
 
-    float promedioGF = MU;
-    float promedioGC = MU;
-
-    if (partidosAtaque > 0) {
-        promedioGF = (float)ataque->historico.golesF / (float)partidosAtaque;
+    if (partidosA > 0) {
+        gf = (float)ataque->historico.golesF / partidosA;
     }
 
-    if (partidosDefensa > 0) {
-        promedioGC = (float)defensa->historico.golesC / (float)partidosDefensa;
+    if (partidosB > 0) {
+        gc = (float)defensa->historico.golesC / partidosB;
     }
 
-    if (promedioGF <= 0.0f) promedioGF = 0.1f;
-    if (promedioGC <= 0.0f) promedioGC = 0.1f;
+    if (gf < 0.2f) gf = 0.2f;
+    if (gc < 0.2f) gc = 0.2f;
 
-    // Formula del enunciado:
-    // lambda = MU * (GFA / MU)^ALFA * (GCB / MU)^BETA
-    float lambda = MU * pow(promedioGF / MU, ALFA) * pow(promedioGC / MU, BETA);
+    // ranking menor = mejor equipo
+    float fuerzaAtaque = (210.0f - ataque->rankingFIFA) / 209.0f;
+    float fuerzaDefensa = (210.0f - defensa->rankingFIFA) / 209.0f;
 
-    // Limites para evitar resultados absurdos
-    if (lambda < 0.15f) lambda = 0.15f;
-    if (lambda > 4.50f) lambda = 4.50f;
+    if (fuerzaAtaque < 0.15f) fuerzaAtaque = 0.15f;
+    if (fuerzaDefensa < 0.15f) fuerzaDefensa = 0.15f;
+
+    float lambda = 0.35f
+                   + gf * 0.45f
+                   + gc * 0.15f
+                   + fuerzaAtaque * 1.10f
+                   - fuerzaDefensa * 0.55f;
+
+    if (lambda < 0.25f) lambda = 0.25f;
+    if (lambda > 2.80f) lambda = 2.80f;
 
     return lambda;
 }
-
 void Partido::jugar() {
     if (!equipoLocal || !equipoVisitante || jugado) return;
 
@@ -162,12 +136,9 @@ void Partido::jugar() {
     golesLocal = poisson(lambdaL);
     golesVisitante = poisson(lambdaV);
 
-    // Posesion
-    int basePosesion = 45 + rand() % 11;
-    posesionLocal = limitarEntero(basePosesion, 35, 65);
+    posesionLocal = limitarEntero(45 + rand() % 11, 35, 65);
     posesionVisitante = 100 - posesionLocal;
 
-    // Tiros
     tirosLocal = golesLocal + 3 + rand() % 8;
     tirosVisitante = golesVisitante + 3 + rand() % 8;
 
@@ -177,7 +148,6 @@ void Partido::jugar() {
     if (tirosArcoLocal > tirosLocal) tirosArcoLocal = tirosLocal;
     if (tirosArcoVisitante > tirosVisitante) tirosArcoVisitante = tirosVisitante;
 
-    // Faltas y tarjetas
     faltasLocal = 5 + rand() % 11;
     faltasVisitante = 5 + rand() % 11;
 
@@ -187,7 +157,6 @@ void Partido::jugar() {
     rojasLocal = (rand() % 100 < 8) ? 1 : 0;
     rojasVisitante = (rand() % 100 < 8) ? 1 : 0;
 
-    // Actualizar torneo actual
     equipoLocal->actual.golesF += golesLocal;
     equipoLocal->actual.golesC += golesVisitante;
 
@@ -207,7 +176,6 @@ void Partido::jugar() {
         equipoVisitante->actual.empatados++;
     }
 
-    // Goles a jugadores
     for (int i = 0; i < golesLocal; i++) {
         A[rand() % 11]->goles++;
     }
@@ -216,7 +184,6 @@ void Partido::jugar() {
         B[rand() % 11]->goles++;
     }
 
-    // Amarillas
     for (int i = 0; i < amarillasLocal; i++) {
         A[rand() % 11]->amarillas++;
     }
@@ -225,7 +192,6 @@ void Partido::jugar() {
         B[rand() % 11]->amarillas++;
     }
 
-    // Rojas
     for (int i = 0; i < rojasLocal; i++) {
         A[rand() % 11]->rojas++;
     }
@@ -234,19 +200,15 @@ void Partido::jugar() {
         B[rand() % 11]->rojas++;
     }
 
-    // Minutos jugados
     for (int i = 0; i < 11; i++) {
         A[i]->minutos += 90;
         B[i]->minutos += 90;
     }
 
     jugado = true;
-
-    delete[] A;
-    delete[] B;
 }
 
-void Partido::mostrar() {
+void Partido::mostrar() const {
     cout << fecha << " " << hora << " | "
          << equipoLocal->pais << " "
          << golesLocal << " - "
@@ -254,7 +216,7 @@ void Partido::mostrar() {
          << equipoVisitante->pais << endl;
 }
 
-void Partido::mostrarDetalle() {
+void Partido::mostrarDetalle() const {
     cout << "----------------------------------------" << endl;
     cout << fecha << " " << hora << endl;
     cout << "Sede: " << sede << endl;
@@ -270,38 +232,39 @@ void Partido::mostrarDetalle() {
     cout << "----------------------------------------" << endl;
 }
 
-string Partido::getFecha() {
+string Partido::getFecha() const {
     return fecha;
 }
 
-string Partido::getHora() {
+string Partido::getHora() const {
     return hora;
 }
 
-Equipo* Partido::getEquipoLocal() {
+Equipo* Partido::getEquipoLocal() const {
     return equipoLocal;
 }
 
-Equipo* Partido::getEquipoVisitante() {
+Equipo* Partido::getEquipoVisitante() const {
     return equipoVisitante;
 }
 
-int Partido::getGolesLocal() {
+int Partido::getGolesLocal() const {
     return golesLocal;
 }
 
-int Partido::getGolesVisitante() {
+int Partido::getGolesVisitante() const {
     return golesVisitante;
 }
 
-int Partido::getPosesionLocal() {
+int Partido::getPosesionLocal() const {
     return posesionLocal;
 }
 
-int Partido::getPosesionVisitante() {
+int Partido::getPosesionVisitante() const {
     return posesionVisitante;
 }
 
-bool Partido::yaSeJugo() {
+bool Partido::yaSeJugo() const {
     return jugado;
 }
+

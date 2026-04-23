@@ -11,7 +11,8 @@ add_executable(DESAFIO2 main.cpp
     equipo.h equipo.cpp
     jugador.h jugador.cpp
     grupo.h grupo.cpp
-    partido.h partido.cpp)
+    partido.h partido.cpp
+    eliminatoria.h eliminatoria.cpp)
 
 include(GNUInstallDirs)
 install(TARGETS DESAFIO2

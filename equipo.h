@@ -4,9 +4,8 @@
 #include <string>
 #include "jugador.h"
 
-using std::string;
+using namespace std;
 
-// ESTADÍSTICAS
 struct Estadisticas {
     int golesF;
     int golesC;
@@ -17,9 +16,7 @@ struct Estadisticas {
     Estadisticas();
 };
 
-// EQUIPO
 class Equipo {
-
 public:
     string pais;
     string tecnico;
@@ -31,16 +28,16 @@ public:
 
     Jugador jugadores[26];
 
-    // Constructor
+private:
+    Jugador* alineacion[11];
+
+public:
     Equipo();
 
-    // Métodos
     void reiniciarActual();
     void inicializarJugadores();
     Jugador** obtenerAlineacion();
-
-private:
-    string intAString(int num);
 };
 
 #endif
+
