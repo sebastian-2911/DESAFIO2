@@ -8,14 +8,16 @@ using namespace std;
 
 class Torneo {
 private:
-    Equipo equipos[48];
+    Equipo* equipos;
     int cantidadEquipos;
+    int capacidadEquipos;
 
     int calcularPuntos(int ganados, int empatados) const;
     int calcularPartidos(int ganados, int empatados, int perdidos) const;
 
 public:
     Torneo();
+    ~Torneo();
 
     void cargarEquipos(const string& nombreArchivo);
 
@@ -28,6 +30,13 @@ public:
 
     Equipo* getEquipos();
     int getCantidad() const;
+
+    Torneo(const Torneo& otro);
+
+    //sobrecarga
+    Torneo& operator=(const Torneo& otro);
+    bool operator==(const Torneo& otro) const;
+    bool operator>(const Torneo& otro) const;
 };
 
 #endif

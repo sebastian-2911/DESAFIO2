@@ -588,3 +588,81 @@ int Eliminatoria::getTotalCuartos() {
 int Eliminatoria::getTotalSemifinales() {
     return totalSemifinales;
 }
+
+Eliminatoria::Eliminatoria(const Eliminatoria& otro)
+{
+    *this = otro;
+}
+//sobrecarga
+Eliminatoria& Eliminatoria::operator=(const Eliminatoria& otro) {
+    if (this != &otro) {
+        for (int i = 0; i < 12; i++) {
+            primeros[i] = otro.primeros[i];
+            segundos[i] = otro.segundos[i];
+            terceros[i] = otro.terceros[i];
+        }
+
+        for (int i = 0; i < 8; i++) {
+            mejoresPrimeros[i] = otro.mejoresPrimeros[i];
+            mejoresSegundos[i] = otro.mejoresSegundos[i];
+            mejoresTerceros[i] = otro.mejoresTerceros[i];
+        }
+
+        for (int i = 0; i < 4; i++) {
+            otrosPrimeros[i] = otro.otrosPrimeros[i];
+            peoresSegundos[i] = otro.peoresSegundos[i];
+        }
+
+        for (int i = 0; i < 16; i++) {
+            dieciseisavos[i] = otro.dieciseisavos[i];
+        }
+
+        for (int i = 0; i < 8; i++) {
+            octavos[i] = otro.octavos[i];
+        }
+
+        for (int i = 0; i < 4; i++) {
+            cuartos[i] = otro.cuartos[i];
+        }
+
+        for (int i = 0; i < 2; i++) {
+            semifinales[i] = otro.semifinales[i];
+        }
+
+        tercerPuesto[0] = otro.tercerPuesto[0];
+        finalPartido[0] = otro.finalPartido[0];
+
+        totalDieciseisavos = otro.totalDieciseisavos;
+        totalOctavos = otro.totalOctavos;
+        totalCuartos = otro.totalCuartos;
+        totalSemifinales = otro.totalSemifinales;
+        totalTercerPuesto = otro.totalTercerPuesto;
+        totalFinal = otro.totalFinal;
+
+        cantidadPrimeros = otro.cantidadPrimeros;
+        cantidadSegundos = otro.cantidadSegundos;
+        cantidadTerceros = otro.cantidadTerceros;
+    }
+
+    return *this;
+}
+
+bool Eliminatoria::operator==(const Eliminatoria& otro) const {
+    return totalDieciseisavos == otro.totalDieciseisavos &&
+           totalOctavos == otro.totalOctavos &&
+           totalCuartos == otro.totalCuartos &&
+           totalSemifinales == otro.totalSemifinales &&
+           totalTercerPuesto == otro.totalTercerPuesto &&
+           totalFinal == otro.totalFinal;
+}
+
+bool Eliminatoria::operator>(const Eliminatoria& otro) const {
+    int totalPartidos = totalDieciseisavos + totalOctavos + totalCuartos +
+                        totalSemifinales + totalTercerPuesto + totalFinal;
+
+    int totalPartidosOtro = otro.totalDieciseisavos + otro.totalOctavos +
+                            otro.totalCuartos + otro.totalSemifinales +
+                            otro.totalTercerPuesto + otro.totalFinal;
+
+    return totalPartidos > totalPartidosOtro;
+}

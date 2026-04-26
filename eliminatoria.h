@@ -118,6 +118,13 @@ public:
     int getTotalOctavos();
     int getTotalCuartos();
     int getTotalSemifinales();
+
+    Eliminatoria(const Eliminatoria& otro);
+
+    //sobrecarga
+    Eliminatoria& operator=(const Eliminatoria& otro);
+    bool operator==(const Eliminatoria& otro) const;
+    bool operator>(const Eliminatoria& otro) const;
 };
 
 #endif

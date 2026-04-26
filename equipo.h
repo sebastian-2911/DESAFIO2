@@ -30,6 +30,10 @@ public:
     Jugador** obtenerAlineacion();
     Jugador* getJugadorAlineado(int indice);
 
+    Equipo(const Equipo& otro);
+
+    //sobrecarga
+    Equipo& operator=(const Equipo& otro);
     bool operator==(const Equipo& otro) const;
     bool operator>(const Equipo& otro) const;
 };

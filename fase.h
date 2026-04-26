@@ -54,6 +54,13 @@ public:
     void avanzarDia();
 
     void mostrarInformeFinal();
+
+    Fase(const Fase& otro);
+
+    //sobrecarga
+    Fase& operator=(const Fase& otro);
+    bool operator==(const Fase& otro) const;
+    bool operator>(const Fase& otro) const;
 };
 
 #endif

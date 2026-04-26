@@ -80,6 +80,14 @@ public:
 
     void prorroga();
     bool huboProrroga() const;
+
+    Partido(const Partido& otro);
+
+
+    //sobrecarga
+    Partido& operator=(const Partido& otro);
+    bool operator==(const Partido& otro) const;
+    bool operator>(const Partido& otro) const;
 };
 
 #endif

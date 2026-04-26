@@ -7,7 +7,16 @@
 using namespace std;
 
 Torneo::Torneo() {
+    capacidadEquipos = 48;
     cantidadEquipos = 0;
+    equipos = new Equipo[capacidadEquipos];
+}
+
+Torneo::~Torneo() {
+    delete[] equipos;
+    equipos = 0;
+    cantidadEquipos = 0;
+    capacidadEquipos = 0;
 }
 
 int Torneo::calcularPuntos(int ganados, int empatados) const {
@@ -19,7 +28,7 @@ int Torneo::calcularPartidos(int ganados, int empatados, int perdidos) const {
 }
 
 void Torneo::cargarEquipos(const string& nombreArchivo) {
-    cargarEquiposDesdeCSV(nombreArchivo, equipos, cantidadEquipos, 48);
+    cargarEquiposDesdeCSV(nombreArchivo, equipos, cantidadEquipos, capacidadEquipos);
 }
 
 void Torneo::guardarEquiposCSV(const string& nombreArchivo) const {
@@ -29,6 +38,7 @@ void Torneo::guardarEquiposCSV(const string& nombreArchivo) const {
 void Torneo::guardarJugadoresCSV(const string& nombreArchivo) const {
     guardarJugadoresEnCSV(nombreArchivo, equipos, cantidadEquipos);
 }
+
 void Torneo::mostrarTodo() const {
     cout << "\n====== EQUIPOS DEL TORNEO ======\n";
 
@@ -131,4 +141,31 @@ Equipo* Torneo::getEquipos() {
 
 int Torneo::getCantidad() const {
     return cantidadEquipos;
+}
+Torneo::Torneo(const Torneo& otro)
+    : cantidadEquipos(otro.cantidadEquipos)
+{
+    for (int i = 0; i < cantidadEquipos; i++) {
+        equipos[i] = otro.equipos[i];
+    }
+}
+//sobrecarga
+Torneo& Torneo::operator=(const Torneo& otro) {
+    if (this != &otro) {
+        cantidadEquipos = otro.cantidadEquipos;
+
+        for (int i = 0; i < cantidadEquipos; i++) {
+            equipos[i] = otro.equipos[i];
+        }
+    }
+
+    return *this;
+}
+
+bool Torneo::operator==(const Torneo& otro) const {
+    return cantidadEquipos == otro.cantidadEquipos;
+}
+
+bool Torneo::operator>(const Torneo& otro) const {
+    return cantidadEquipos > otro.cantidadEquipos;
 }

@@ -45,6 +45,13 @@ public:
 
     bool todosLosPartidosJugados() const;
 
+    Grupo(const Grupo& otro);
+
+    //sobrecarga
+    Grupo& operator=(const Grupo& otro);
+    bool operator==(const Grupo& otro) const;
+    bool operator>(const Grupo& otro) const;
+
 };
 
 #endif

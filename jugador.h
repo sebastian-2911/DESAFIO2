@@ -15,7 +15,13 @@ public:
     int rojas;
     int minutos;
 
-    Jugador();  // constructor
+    Jugador();
+    Jugador(const Jugador& otro);
+
+    //sobrecarga
+    Jugador& operator=(const Jugador& otro);
+    bool operator==(const Jugador& otro) const;
+    bool operator>(const Jugador& otro) const;
 };
 
 #endif

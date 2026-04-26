@@ -405,3 +405,54 @@ void Grupo::mostrarCalendario() const {
 
     cout << endl;
 }
+
+Grupo::Grupo(const Grupo& otro)
+    : totalPartidos(otro.totalPartidos)
+{
+    for (int i = 0; i < 48; i++) {
+        grupos[i] = otro.grupos[i];
+    }
+
+    for (int i = 0; i < 12; i++) {
+        bombo1[i] = otro.bombo1[i];
+        bombo2[i] = otro.bombo2[i];
+        bombo3[i] = otro.bombo3[i];
+        bombo4[i] = otro.bombo4[i];
+    }
+
+    for (int i = 0; i < 72; i++) {
+        partidos[i] = otro.partidos[i];
+    }
+}
+
+//sobrecarga
+Grupo& Grupo::operator=(const Grupo& otro) {
+    if (this != &otro) {
+        totalPartidos = otro.totalPartidos;
+
+        for (int i = 0; i < 48; i++) {
+            grupos[i] = otro.grupos[i];
+        }
+
+        for (int i = 0; i < 12; i++) {
+            bombo1[i] = otro.bombo1[i];
+            bombo2[i] = otro.bombo2[i];
+            bombo3[i] = otro.bombo3[i];
+            bombo4[i] = otro.bombo4[i];
+        }
+
+        for (int i = 0; i < 72; i++) {
+            partidos[i] = otro.partidos[i];
+        }
+    }
+
+    return *this;
+}
+
+bool Grupo::operator==(const Grupo& otro) const {
+    return totalPartidos == otro.totalPartidos;
+}
+
+bool Grupo::operator>(const Grupo& otro) const {
+    return totalPartidos > otro.totalPartidos;
+}

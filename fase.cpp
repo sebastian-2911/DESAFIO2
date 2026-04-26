@@ -469,3 +469,35 @@ void Fase::mostrarInformeFinal() {
 void Fase::mostrarCalendario() {
     grupos.mostrarCalendario();
 }
+
+Fase::Fase(const Fase& otro)
+{
+    *this = otro;
+}
+
+//sobrecarga
+Fase& Fase::operator=(const Fase& otro) {
+    if (this != &otro) {
+        grupos = otro.grupos;
+        eliminatoria = otro.eliminatoria;
+
+        equiposTorneo = otro.equiposTorneo;
+        cantidadEquipos = otro.cantidadEquipos;
+
+        diaActual = otro.diaActual;
+        dieciseisavosCreados = otro.dieciseisavosCreados;
+        eliminatoriaJugada = otro.eliminatoriaJugada;
+    }
+
+    return *this;
+}
+
+bool Fase::operator==(const Fase& otro) const {
+    return equiposTorneo == otro.equiposTorneo &&
+           cantidadEquipos == otro.cantidadEquipos &&
+           diaActual == otro.diaActual;
+}
+
+bool Fase::operator>(const Fase& otro) const {
+    return diaActual > otro.diaActual;
+}

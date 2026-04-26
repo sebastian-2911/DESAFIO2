@@ -329,3 +329,84 @@ bool Partido::yaSeJugo() const {
 bool Partido::huboProrroga() const {
     return prorrogaJugada;
 }
+
+Partido::Partido(const Partido& otro)
+    : equipoLocal(otro.equipoLocal),
+    equipoVisitante(otro.equipoVisitante),
+    sede(otro.sede),
+    arbitro1(otro.arbitro1),
+    arbitro2(otro.arbitro2),
+    arbitro3(otro.arbitro3),
+    fecha(otro.fecha),
+    hora(otro.hora),
+    golesLocal(otro.golesLocal),
+    golesVisitante(otro.golesVisitante),
+    posesionLocal(otro.posesionLocal),
+    posesionVisitante(otro.posesionVisitante),
+    tirosLocal(otro.tirosLocal),
+    tirosVisitante(otro.tirosVisitante),
+    tirosArcoLocal(otro.tirosArcoLocal),
+    tirosArcoVisitante(otro.tirosArcoVisitante),
+    faltasLocal(otro.faltasLocal),
+    faltasVisitante(otro.faltasVisitante),
+    amarillasLocal(otro.amarillasLocal),
+    amarillasVisitante(otro.amarillasVisitante),
+    rojasLocal(otro.rojasLocal),
+    rojasVisitante(otro.rojasVisitante),
+    jugado(otro.jugado),
+    prorrogaJugada(otro.prorrogaJugada)
+{
+}
+// sobrecarga
+Partido& Partido::operator=(const Partido& otro) {
+    if (this != &otro) {
+        equipoLocal = otro.equipoLocal;
+        equipoVisitante = otro.equipoVisitante;
+
+        sede = otro.sede;
+        arbitro1 = otro.arbitro1;
+        arbitro2 = otro.arbitro2;
+        arbitro3 = otro.arbitro3;
+        fecha = otro.fecha;
+        hora = otro.hora;
+
+        golesLocal = otro.golesLocal;
+        golesVisitante = otro.golesVisitante;
+
+        posesionLocal = otro.posesionLocal;
+        posesionVisitante = otro.posesionVisitante;
+
+        tirosLocal = otro.tirosLocal;
+        tirosVisitante = otro.tirosVisitante;
+
+        tirosArcoLocal = otro.tirosArcoLocal;
+        tirosArcoVisitante = otro.tirosArcoVisitante;
+
+        faltasLocal = otro.faltasLocal;
+        faltasVisitante = otro.faltasVisitante;
+
+        amarillasLocal = otro.amarillasLocal;
+        amarillasVisitante = otro.amarillasVisitante;
+
+        rojasLocal = otro.rojasLocal;
+        rojasVisitante = otro.rojasVisitante;
+
+        jugado = otro.jugado;
+        prorrogaJugada = otro.prorrogaJugada;
+    }
+
+    return *this;
+}
+
+bool Partido::operator==(const Partido& otro) const {
+    return equipoLocal == otro.equipoLocal &&
+           equipoVisitante == otro.equipoVisitante &&
+           fecha == otro.fecha;
+}
+
+bool Partido::operator>(const Partido& otro) const {
+    int golesTotales = golesLocal + golesVisitante;
+    int golesTotalesOtro = otro.golesLocal + otro.golesVisitante;
+
+    return golesTotales > golesTotalesOtro;
+}

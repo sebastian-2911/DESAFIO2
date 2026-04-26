@@ -71,3 +71,49 @@ Jugador* Equipo::getJugadorAlineado(int indice) {
     }
     return alineacion[indice];
 }
+Equipo::Equipo(const Equipo& otro)
+    : pais(otro.pais),
+    tecnico(otro.tecnico),
+    confederacion(otro.confederacion),
+    rankingFIFA(otro.rankingFIFA),
+    historico(otro.historico),
+    actual(otro.actual)
+{
+    for (int i = 0; i < 26; i++) {
+        jugadores[i] = otro.jugadores[i];
+    }
+
+    for (int i = 0; i < 11; i++) {
+        alineacion[i] = 0;
+    }
+}
+//sobrecarga
+Equipo& Equipo::operator=(const Equipo& otro) {
+    if (this != &otro) {
+        pais = otro.pais;
+        tecnico = otro.tecnico;
+        confederacion = otro.confederacion;
+        rankingFIFA = otro.rankingFIFA;
+
+        historico = otro.historico;
+        actual = otro.actual;
+
+        for (int i = 0; i < 26; i++) {
+            jugadores[i] = otro.jugadores[i];
+        }
+
+        for (int i = 0; i < 11; i++) {
+            alineacion[i] = 0;
+        }
+    }
+
+    return *this;
+}
+
+bool Equipo::operator==(const Equipo& otro) const {
+    return pais == otro.pais;
+}
+
+bool Equipo::operator>(const Equipo& otro) const {
+    return rankingFIFA < otro.rankingFIFA;
+}
