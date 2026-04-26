@@ -2,11 +2,6 @@
 #include <cstdlib>
 #include "metricas.h"
 
-// ESTADISTICAS
-Estadisticas::Estadisticas()
-    : golesF(0), golesC(0), ganados(0), empatados(0), perdidos(0) {
-}
-
 //  CONSTRUCTOR
 Equipo::Equipo()
     : pais(""),

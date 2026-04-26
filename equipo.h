@@ -3,18 +3,9 @@
 
 #include <string>
 #include "jugador.h"
+#include "estadisticas.h"
 
 using namespace std;
-
-struct Estadisticas {
-    int golesF;
-    int golesC;
-    int ganados;
-    int empatados;
-    int perdidos;
-
-    Estadisticas();
-};
 
 class Equipo {
 public:
@@ -38,7 +29,9 @@ public:
     void inicializarJugadores();
     Jugador** obtenerAlineacion();
     Jugador* getJugadorAlineado(int indice);
+
+    bool operator==(const Equipo& otro) const;
+    bool operator>(const Equipo& otro) const;
 };
 
 #endif
-

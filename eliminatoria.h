@@ -3,18 +3,10 @@
 
 #include "equipo.h"
 #include "partido.h"
+#include "clasificado.h"
 #include <string>
 
 using namespace std;
-
-struct Clasificado {
-    Equipo* equipo;
-    char grupo;
-    int posicion;
-    int puntos;
-    int diferencia;
-    int golesFavor;
-};
 
 class Eliminatoria {
 private:
