@@ -1,6 +1,7 @@
 #include "fase.h"
 #include <iostream>
 #include <fstream>
+#include "metricas.h"
 
 using namespace std;
 
@@ -71,6 +72,7 @@ void Fase::guardarCSVAutomatico() {
     jugadoresFile << "Equipo;Numero;Nombre;Apellido;Goles;Amarillas;Rojas;Minutos\n";
 
     for (int i = 0; i < cantidadEquipos; i++) {
+        Metricas::sumarIteracion();
         Equipo& e = equiposTorneo[i];
 
         int gf = e.historico.golesF + e.actual.golesF;
@@ -84,6 +86,7 @@ void Fase::guardarCSVAutomatico() {
                     << g << ";" << emp << ";" << p << "\n";
 
         for (int j = 0; j < 26; j++) {
+            Metricas::sumarIteracion();
             Jugador& jug = e.jugadores[j];
 
             jugadoresFile << e.pais << ";"
@@ -101,9 +104,16 @@ void Fase::guardarCSVAutomatico() {
     jugadoresFile.close();
 }
 
-void Fase::crearDieciseisavos() {
+bool Fase::crearDieciseisavos() {
     if (dieciseisavosCreados) {
-        return;
+        cout << "\nLos dieciseisavos ya fueron creados." << endl;
+        return false;
+    }
+
+    if (!grupos.todosLosPartidosJugados()) {
+        cout << "\nERROR: No se pueden crear los dieciseisavos." << endl;
+        cout << "Debe jugar todos los partidos de la fase de grupos primero." << endl;
+        return false;
     }
 
     Equipo* clasificados[48];
@@ -111,8 +121,10 @@ void Fase::crearDieciseisavos() {
     eliminatoria.crearDesdeGrupos(clasificados);
 
     dieciseisavosCreados = true;
-}
 
+    cout << "\nDieciseisavos creados correctamente." << endl;
+    return true;
+}
 void Fase::mostrarDieciseisavos() {
     if (!dieciseisavosCreados) {
         cout << "\nPrimero debe crearse la fase eliminatoria." << endl;
@@ -168,7 +180,9 @@ void Fase::terminarFaseDeGrupos() {
     cout << "====================================" << endl;
 
     crearDieciseisavos();
-    jugarTodaEliminatoria();
+
+    cout << "\nYa puede usar la opcion 6 para mostrar los dieciseisavos." << endl;
+    cout << "Luego use la opcion 7 para jugar la eliminatoria." << endl;
 }
 
 void Fase::avanzarDia() {
@@ -196,36 +210,35 @@ Jugador* Fase::maximoGoleadorDeEquipo(Equipo* equipo) {
         return 0;
     }
 
-    Jugador** alineacion = equipo->obtenerAlineacion();
-    if (!alineacion) {
-        return 0;
-    }
+    Jugador* mejor = &equipo->jugadores[0];
 
-    Jugador* mejor = alineacion[0];
+    for (int i = 1; i < 26; i++) {
+        Metricas::sumarIteracion();
 
-    for (int i = 1; i < 11; i++) {
-        if (alineacion[i]->goles > mejor->goles) {
-            mejor = alineacion[i];
+        if (equipo->jugadores[i].goles > mejor->goles) {
+            mejor = &equipo->jugadores[i];
         }
     }
 
     return mejor;
 }
-
 void Fase::insertarTopJugador(Jugador* candidato, Jugador* top[3]) {
     if (!candidato) {
         return;
     }
 
     for (int i = 0; i < 3; i++) {
+        Metricas::sumarIteracion();
         if (top[i] == candidato) {
             return;
         }
     }
 
     for (int i = 0; i < 3; i++) {
+        Metricas::sumarIteracion();
         if (top[i] == 0 || candidato->goles > top[i]->goles) {
             for (int j = 2; j > i; j--) {
+                Metricas::sumarIteracion();
                 top[j] = top[j - 1];
             }
             top[i] = candidato;
@@ -240,11 +253,13 @@ void Fase::contarConfederaciones(Partido* ronda, int cantidadPartidos,
     int conteo[6] = {0};
 
     for (int i = 0; i < cantidadPartidos; i++) {
+        Metricas::sumarIteracion();
         Equipo* local = ronda[i].getEquipoLocal();
         Equipo* visitante = ronda[i].getEquipoVisitante();
 
         if (local) {
             for (int j = 0; j < 6; j++) {
+                Metricas::sumarIteracion();
                 if (local->confederacion == nombres[j]) {
                     conteo[j]++;
                     break;
@@ -254,6 +269,7 @@ void Fase::contarConfederaciones(Partido* ronda, int cantidadPartidos,
 
         if (visitante) {
             for (int j = 0; j < 6; j++) {
+                Metricas::sumarIteracion();
                 if (visitante->confederacion == nombres[j]) {
                     conteo[j]++;
                     break;
@@ -266,6 +282,7 @@ void Fase::contarConfederaciones(Partido* ronda, int cantidadPartidos,
     mejorCantidad = conteo[0];
 
     for (int i = 1; i < 6; i++) {
+        Metricas::sumarIteracion();
         if (conteo[i] > mejorCantidad) {
             mejorCantidad = conteo[i];
             mejorConf = nombres[i];
@@ -340,26 +357,19 @@ void Fase::mostrarTop3Goleadores() {
     Equipo* equipoTop[3] = {0, 0, 0};
 
     for (int i = 0; i < cantidadEquipos; i++) {
-        Jugador** alineacion = equiposTorneo[i].obtenerAlineacion();
+        Metricas::sumarIteracion();
 
-        for (int j = 0; j < 11; j++) {
-            Jugador* candidato = alineacion[j];
+        for (int j = 0; j < 26; j++) {
+            Metricas::sumarIteracion();
 
-            bool repetido = false;
-            for (int k = 0; k < 3; k++) {
-                if (top[k] == candidato) {
-                    repetido = true;
-                    break;
-                }
-            }
-
-            if (repetido) {
-                continue;
-            }
+            Jugador* candidato = &equiposTorneo[i].jugadores[j];
 
             for (int k = 0; k < 3; k++) {
+                Metricas::sumarIteracion();
+
                 if (top[k] == 0 || candidato->goles > top[k]->goles) {
                     for (int m = 2; m > k; m--) {
+                        Metricas::sumarIteracion();
                         top[m] = top[m - 1];
                         equipoTop[m] = equipoTop[m - 1];
                     }
@@ -373,6 +383,8 @@ void Fase::mostrarTop3Goleadores() {
     }
 
     for (int i = 0; i < 3; i++) {
+        Metricas::sumarIteracion();
+
         if (top[i]) {
             cout << (i + 1) << ". "
                  << top[i]->nombre << " " << top[i]->apellido
@@ -383,7 +395,6 @@ void Fase::mostrarTop3Goleadores() {
         }
     }
 }
-
 void Fase::mostrarEquipoMasGoleadorHistorico() {
     if (!equiposTorneo || cantidadEquipos <= 0) {
         return;
@@ -393,6 +404,7 @@ void Fase::mostrarEquipoMasGoleadorHistorico() {
     int mejorTotal = mejor->historico.golesF + mejor->actual.golesF;
 
     for (int i = 1; i < cantidadEquipos; i++) {
+        Metricas::sumarIteracion();
         int total = equiposTorneo[i].historico.golesF + equiposTorneo[i].actual.golesF;
 
         if (total > mejorTotal) {
@@ -454,4 +466,6 @@ void Fase::mostrarInformeFinal() {
 
     cout << endl;
 }
-
+void Fase::mostrarCalendario() {
+    grupos.mostrarCalendario();
+}

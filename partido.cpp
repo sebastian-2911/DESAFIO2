@@ -1,9 +1,10 @@
-#include "Partido.h"
-#include "Equipo.h"
-#include "Jugador.h"
+#include "partido.h"
+#include "equipo.h"
+#include "jugador.h"
 #include <iostream>
 #include <cmath>
 #include <cstdlib>
+#include "metricas.h"
 
 using namespace std;
 
@@ -35,6 +36,7 @@ void Partido::reset() {
     rojasVisitante = 0;
 
     jugado = false;
+    prorrogaJugada = false;
 }
 
 Partido::Partido() {
@@ -77,6 +79,7 @@ int Partido::poisson(float lambda) const {
     float p = 1.0f;
 
     do {
+        Metricas::sumarIteracion();
         k++;
         p *= (float)rand() / (float)RAND_MAX;
     } while (p > L);
@@ -136,9 +139,18 @@ void Partido::jugar() {
     golesLocal = poisson(lambdaL);
     golesVisitante = poisson(lambdaV);
 
-    posesionLocal = limitarEntero(45 + rand() % 11, 35, 65);
+    // ===== POSESION BASADA EN RANKING =====
+    int rankingLocal = equipoLocal->rankingFIFA;
+    int rankingVisitante = equipoVisitante->rankingFIFA;
+
+    int diferencia = rankingVisitante - rankingLocal;
+
+    posesionLocal = 50 + (diferencia / 3) + ((rand() % 11) - 5);
+
+    posesionLocal = limitarEntero(posesionLocal, 30, 70);
     posesionVisitante = 100 - posesionLocal;
 
+    // ===== OTRAS ESTADISTICAS =====
     tirosLocal = golesLocal + 3 + rand() % 8;
     tirosVisitante = golesVisitante + 3 + rand() % 8;
 
@@ -157,6 +169,7 @@ void Partido::jugar() {
     rojasLocal = (rand() % 100 < 8) ? 1 : 0;
     rojasVisitante = (rand() % 100 < 8) ? 1 : 0;
 
+    // ===== ACTUALIZAR EQUIPOS =====
     equipoLocal->actual.golesF += golesLocal;
     equipoLocal->actual.golesC += golesVisitante;
 
@@ -176,38 +189,81 @@ void Partido::jugar() {
         equipoVisitante->actual.empatados++;
     }
 
+    // ===== ESTADISTICAS DE JUGADORES =====
     for (int i = 0; i < golesLocal; i++) {
+        Metricas::sumarIteracion();
         A[rand() % 11]->goles++;
     }
 
     for (int i = 0; i < golesVisitante; i++) {
+        Metricas::sumarIteracion();
         B[rand() % 11]->goles++;
     }
 
     for (int i = 0; i < amarillasLocal; i++) {
+        Metricas::sumarIteracion();
         A[rand() % 11]->amarillas++;
     }
 
     for (int i = 0; i < amarillasVisitante; i++) {
+        Metricas::sumarIteracion();
         B[rand() % 11]->amarillas++;
     }
 
     for (int i = 0; i < rojasLocal; i++) {
+        Metricas::sumarIteracion();
         A[rand() % 11]->rojas++;
     }
 
     for (int i = 0; i < rojasVisitante; i++) {
+        Metricas::sumarIteracion();
         B[rand() % 11]->rojas++;
     }
 
     for (int i = 0; i < 11; i++) {
+        Metricas::sumarIteracion();
         A[i]->minutos += 90;
         B[i]->minutos += 90;
     }
 
     jugado = true;
 }
+void Partido::prorroga() {
+    if (!jugado) return;
+    if (golesLocal != golesVisitante) return;
 
+    prorrogaJugada = true;
+
+    int fuerzaLocal = 211 - equipoLocal->rankingFIFA;
+    int fuerzaVisitante = 211 - equipoVisitante->rankingFIFA;
+
+    if (fuerzaLocal < 1) fuerzaLocal = 1;
+    if (fuerzaVisitante < 1) fuerzaVisitante = 1;
+
+    int total = fuerzaLocal + fuerzaVisitante;
+    int r = rand() % total;
+
+    if (r < fuerzaLocal) {
+        golesLocal++;
+        equipoLocal->actual.golesF++;
+        equipoVisitante->actual.golesC++;
+
+        equipoLocal->getJugadorAlineado(rand() % 11)->goles++;
+    }
+    else {
+        golesVisitante++;
+        equipoVisitante->actual.golesF++;
+        equipoLocal->actual.golesC++;
+
+        equipoVisitante->getJugadorAlineado(rand() % 11)->goles++;
+    }
+
+    for (int i = 0; i < 11; i++) {
+        Metricas::sumarIteracion();
+        equipoLocal->getJugadorAlineado(i)->minutos += 30;
+        equipoVisitante->getJugadorAlineado(i)->minutos += 30;
+    }
+}
 void Partido::mostrar() const {
     cout << fecha << " " << hora << " | "
          << equipoLocal->pais << " "
@@ -223,6 +279,9 @@ void Partido::mostrarDetalle() const {
     cout << "Arbitros: " << arbitro1 << ", " << arbitro2 << ", " << arbitro3 << endl;
     cout << equipoLocal->pais << " " << golesLocal
          << " - " << golesVisitante << " " << equipoVisitante->pais << endl;
+    if (prorrogaJugada) {
+        cout << "Definido en prorroga" << endl;
+    }
     cout << "Posesion: " << posesionLocal << "% - " << posesionVisitante << "%" << endl;
     cout << "Tiros: " << tirosLocal << " - " << tirosVisitante << endl;
     cout << "Tiros al arco: " << tirosArcoLocal << " - " << tirosArcoVisitante << endl;
@@ -267,4 +326,6 @@ int Partido::getPosesionVisitante() const {
 bool Partido::yaSeJugo() const {
     return jugado;
 }
-
+bool Partido::huboProrroga() const {
+    return prorrogaJugada;
+}

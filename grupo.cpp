@@ -3,6 +3,7 @@
 #include "partido.h"
 #include <iostream>
 #include <cstdlib>
+#include "metricas.h"
 
 using namespace std;
 
@@ -11,6 +12,7 @@ Grupo::Grupo() {
     totalPartidos = 0;
 
     for (int i = 0; i < 48; i++) {
+        Metricas::sumarIteracion();
         grupos[i] = 0;
     }
 }
@@ -25,6 +27,7 @@ void Grupo::intercambiar(Equipo*& a, Equipo*& b) {
 // BARAJAR BOMBO
 void Grupo::barajarBombo(Equipo** bombo, int n) {
     for (int i = 0; i < n; i++) {
+        Metricas::sumarIteracion();
         int r = rand() % n;
         intercambiar(bombo[i], bombo[r]);
     }
@@ -35,6 +38,7 @@ bool Grupo::sePuedeAgregar(Equipo** grupoTemp, int usados, Equipo* candidato) {
     int uefa = 0;
 
     for (int i = 0; i < usados; i++) {
+        Metricas::sumarIteracion();
         if (grupoTemp[i]->confederacion == "UEFA") {
             uefa++;
         }
@@ -63,6 +67,7 @@ void Grupo::crearBombos(Equipo* equipos, int cantidad) {
     bool usaAgregado = false;
 
     for (int i = 0; i < cantidad; i++) {
+        Metricas::sumarIteracion();
         if (equipos[i].pais == "United States") {
             bombo1[n1++] = &equipos[i];
             usaAgregado = true;
@@ -71,6 +76,7 @@ void Grupo::crearBombos(Equipo* equipos, int cantidad) {
     }
 
     for (int i = 0; i < cantidad; i++) {
+        Metricas::sumarIteracion();
         if (usaAgregado && equipos[i].pais == "United States") {
             continue;
         }
@@ -127,10 +133,12 @@ bool Grupo::armarGruposRecursivo(int grupoActual, int bomboActual,
 
     Equipo* grupoTemp[4];
     for (int i = 0; i < bomboActual; i++) {
+        Metricas::sumarIteracion();
         grupoTemp[i] = grupos[base + i];
     }
 
     for (int i = 0; i < 12; i++) {
+        Metricas::sumarIteracion();
         if (!usados[i]) {
             if (sePuedeAgregar(grupoTemp, bomboActual, bombo[i])) {
                 grupos[base + bomboActual] = bombo[i];
@@ -160,6 +168,7 @@ void Grupo::crearGrupos(Equipo* equipos, int cantidad) {
     barajarBombo(bombo4, 12);
 
     for (int i = 0; i < 48; i++) {
+        Metricas::sumarIteracion();
         grupos[i] = 0;
     }
 
@@ -207,29 +216,38 @@ string Grupo::construirFechaDesdeIndice(int dia) const {
 // CREAR PARTIDOS
 void Grupo::crearPartidos() {
     totalPartidos = 0;
-    int dia = 0;
 
-    for (int g = 0; g < 12; g++) {
-        int base = g * 4;
+    for (int ronda = 0; ronda < 3; ronda++) {
+        Metricas::sumarIteracion();
+        for (int g = 0; g < 12; g++) {
+            Metricas::sumarIteracion();
+            int base = g * 4;
 
-        Equipo* e1 = grupos[base + 0];
-        Equipo* e2 = grupos[base + 1];
-        Equipo* e3 = grupos[base + 2];
-        Equipo* e4 = grupos[base + 3];
+            Equipo* e1 = grupos[base];
+            Equipo* e2 = grupos[base + 1];
+            Equipo* e3 = grupos[base + 2];
+            Equipo* e4 = grupos[base + 3];
 
-        Partido lista[6] = {
-            Partido(e1, e2),
-            Partido(e1, e3),
-            Partido(e1, e4),
-            Partido(e2, e3),
-            Partido(e2, e4),
-            Partido(e3, e4)
-        };
-
-        for (int i = 0; i < 6; i++) {
+            int dia = ronda * 6 + (g / 2);
             string fecha = construirFechaDesdeIndice(dia);
 
-            lista[i].configurar(
+            Partido p1;
+            Partido p2;
+
+            if (ronda == 0) {
+                p1 = Partido(e1, e2);
+                p2 = Partido(e3, e4);
+            }
+            else if (ronda == 1) {
+                p1 = Partido(e1, e3);
+                p2 = Partido(e2, e4);
+            }
+            else {
+                p1 = Partido(e1, e4);
+                p2 = Partido(e2, e3);
+            }
+
+            p1.configurar(
                 fecha,
                 "00:00",
                 "nombreSede",
@@ -238,14 +256,23 @@ void Grupo::crearPartidos() {
                 "codArbitro3"
                 );
 
-            partidos[totalPartidos] = lista[i];
+            p2.configurar(
+                fecha,
+                "00:00",
+                "nombreSede",
+                "codArbitro1",
+                "codArbitro2",
+                "codArbitro3"
+                );
+
+            partidos[totalPartidos] = p1;
             totalPartidos++;
 
-            dia = (dia + 1) % 19;
+            partidos[totalPartidos] = p2;
+            totalPartidos++;
         }
     }
 }
-
 // JUGAR DÍA
 void Grupo::jugarDia(string fecha) {
     cout << "\nPARTIDOS DEL DIA" << endl;
@@ -254,6 +281,7 @@ void Grupo::jugarDia(string fecha) {
     bool huboPartidos = false;
 
     for (int i = 0; i < totalPartidos; i++) {
+        Metricas::sumarIteracion();
         if (partidos[i].getFecha() == fecha) {
             partidos[i].jugar();
             partidos[i].mostrarDetalle();
@@ -270,6 +298,7 @@ void Grupo::jugarDia(string fecha) {
 
 // REVISAR SI YA SE JUGARON TODOS LOS PARTIDOS
 bool Grupo::todosLosPartidosJugados() const {
+    Metricas::sumarIteracion();
     for (int i = 0; i < totalPartidos; i++) {
         if (!partidos[i].yaSeJugo()) {
             return false;
@@ -299,7 +328,9 @@ bool Grupo::vaAntes(Equipo* a, Equipo* b) {
 // ORDENAR GRUPO
 void Grupo::ordenarGrupo(int inicio) {
     for (int i = inicio; i < inicio + 4; i++) {
+        Metricas::sumarIteracion();
         for (int j = i + 1; j < inicio + 4; j++) {
+            Metricas::sumarIteracion();
             if (!vaAntes(grupos[i], grupos[j])) {
                 intercambiar(grupos[i], grupos[j]);
             }
@@ -310,10 +341,12 @@ void Grupo::ordenarGrupo(int inicio) {
 // OBTENER GRUPOS ORDENADOS
 void Grupo::obtenerGruposOrdenados(Equipo* destino[48]) {
     for (int g = 0; g < 12; g++) {
+        Metricas::sumarIteracion();
         int inicio = g * 4;
         ordenarGrupo(inicio);
 
         for (int i = 0; i < 4; i++) {
+            Metricas::sumarIteracion();
             destino[inicio + i] = grupos[inicio + i];
         }
     }
@@ -324,6 +357,7 @@ void Grupo::mostrarGrupos() {
     char letra = 'A';
 
     for (int i = 0; i < 12; i++) {
+        Metricas::sumarIteracion();
         int inicio = i * 4;
 
         ordenarGrupo(inicio);
@@ -331,6 +365,7 @@ void Grupo::mostrarGrupos() {
         cout << "Grupo " << letra << endl;
 
         for (int j = 0; j < 4; j++) {
+            Metricas::sumarIteracion();
             Equipo* e = grupos[inicio + j];
             int puntos = e->actual.ganados * 3 + e->actual.empatados;
 
@@ -345,4 +380,28 @@ void Grupo::mostrarGrupos() {
         cout << endl;
         letra++;
     }
+}
+void Grupo::mostrarCalendario() const {
+    cout << "\n===== CALENDARIO FASE DE GRUPOS =====" << endl;
+    cout << "=====================================" << endl;
+
+    string fechaActual = "";
+
+    for (int i = 0; i < totalPartidos; i++) {
+        Metricas::sumarIteracion();
+        if (partidos[i].getFecha() != fechaActual) {
+            fechaActual = partidos[i].getFecha();
+
+            cout << "\nFecha: " << fechaActual << endl;
+            cout << "------------------------" << endl;
+        }
+
+        cout << partidos[i].getHora() << " | "
+             << partidos[i].getEquipoLocal()->pais
+             << " vs "
+             << partidos[i].getEquipoVisitante()->pais
+             << endl;
+    }
+
+    cout << endl;
 }

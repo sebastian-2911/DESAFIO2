@@ -43,10 +43,12 @@ public:
 
     string construirFechaActual() const;
 
-    void crearDieciseisavos();
+    bool crearDieciseisavos();
     void mostrarDieciseisavos();
     void jugarDieciseisavos();
     void jugarTodaEliminatoria();
+
+    void mostrarCalendario();
 
     void mostrarGrupos();
     void avanzarDia();

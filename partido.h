@@ -41,6 +41,7 @@ private:
     int rojasVisitante;
 
     bool jugado;
+    bool prorrogaJugada;
 
     void reset();
     int limitarEntero(int valor, int minimo, int maximo) const;
@@ -76,6 +77,9 @@ public:
     int getPosesionVisitante() const;
 
     bool yaSeJugo() const;
+
+    void prorroga();
+    bool huboProrroga() const;
 };
 
 #endif

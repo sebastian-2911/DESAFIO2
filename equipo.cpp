@@ -1,5 +1,6 @@
 #include "equipo.h"
 #include <cstdlib>
+#include "metricas.h"
 
 // ESTADISTICAS
 Estadisticas::Estadisticas()
@@ -17,6 +18,7 @@ Equipo::Equipo()
     inicializarJugadores();
 
     for (int i = 0; i < 11; i++) {
+        Metricas::sumarIteracion();
         alineacion[i] = 0;
     }
 }
@@ -31,6 +33,7 @@ void Equipo::reiniciarActual() {
 
 void Equipo::inicializarJugadores() {
     for (int i = 0; i < 26; i++) {
+        Metricas::sumarIteracion();
 
         stringstream ss1;
         stringstream ss2;
@@ -53,9 +56,11 @@ Jugador** Equipo::obtenerAlineacion() {
     bool usados[26] = {false};
 
     for (int i = 0; i < 11; i++) {
+        Metricas::sumarIteracion();
         int indice;
 
         do {
+            Metricas::sumarIteracion();
             indice = rand() % 26;
         } while (usados[indice]);
 
@@ -64,4 +69,10 @@ Jugador** Equipo::obtenerAlineacion() {
     }
 
     return alineacion;
+}
+Jugador* Equipo::getJugadorAlineado(int indice) {
+    if (indice < 0 || indice >= 11) {
+        return 0;
+    }
+    return alineacion[indice];
 }

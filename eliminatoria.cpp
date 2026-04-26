@@ -1,6 +1,7 @@
 #include "eliminatoria.h"
 #include <iostream>
 #include <cstdlib>
+#include "metricas.h"
 
 using namespace std;
 
@@ -41,7 +42,9 @@ void Eliminatoria::intercambiar(Clasificado& a, Clasificado& b) {
 
 void Eliminatoria::ordenarClasificados(Clasificado* arreglo, int n) {
     for (int i = 0; i < n; i++) {
+        Metricas::sumarIteracion();
         for (int j = i + 1; j < n; j++) {
+            Metricas::sumarIteracion();
             if (!mejorQue(arreglo[i], arreglo[j])) {
                 intercambiar(arreglo[i], arreglo[j]);
             }
@@ -51,6 +54,7 @@ void Eliminatoria::ordenarClasificados(Clasificado* arreglo, int n) {
 
 void Eliminatoria::copiarGrupoOrdenado(Equipo* grupo[4], Clasificado salida[4], char letraGrupo) {
     for (int i = 0; i < 4; i++) {
+        Metricas::sumarIteracion();
         salida[i].equipo = grupo[i];
         salida[i].grupo = letraGrupo;
         salida[i].posicion = i + 1;
@@ -60,7 +64,9 @@ void Eliminatoria::copiarGrupoOrdenado(Equipo* grupo[4], Clasificado salida[4], 
     }
 
     for (int i = 0; i < 4; i++) {
+        Metricas::sumarIteracion();
         for (int j = i + 1; j < 4; j++) {
+            Metricas::sumarIteracion();
             if (!mejorQue(salida[i], salida[j])) {
                 intercambiar(salida[i], salida[j]);
             }
@@ -68,6 +74,7 @@ void Eliminatoria::copiarGrupoOrdenado(Equipo* grupo[4], Clasificado salida[4], 
     }
 
     for (int i = 0; i < 4; i++) {
+        Metricas::sumarIteracion();
         salida[i].posicion = i + 1;
     }
 }
@@ -78,12 +85,14 @@ void Eliminatoria::armarClasificados(Equipo* gruposOrdenados[48]) {
     cantidadTerceros = 0;
 
     for (int g = 0; g < 12; g++) {
+        Metricas::sumarIteracion();
         Equipo* grupoTemp[4];
         Clasificado ordenados[4];
         int base = g * 4;
         char letra = 'A' + g;
 
         for (int i = 0; i < 4; i++) {
+            Metricas::sumarIteracion();
             grupoTemp[i] = gruposOrdenados[base + i];
         }
 
@@ -99,12 +108,14 @@ void Eliminatoria::armarClasificados(Equipo* gruposOrdenados[48]) {
     ordenarClasificados(terceros, 12);
 
     for (int i = 0; i < 8; i++) {
+        Metricas::sumarIteracion();
         mejoresPrimeros[i] = primeros[i];
         mejoresTerceros[i] = terceros[i];
         mejoresSegundos[i] = segundos[i];
     }
 
     for (int i = 0; i < 4; i++) {
+        Metricas::sumarIteracion();
         otrosPrimeros[i] = primeros[8 + i];
         peoresSegundos[i] = segundos[8 + i];
     }
@@ -123,6 +134,7 @@ bool Eliminatoria::emparejarPrimerosVsTerceros(int idxPrimero,
     if (idxPrimero == 8) return true;
 
     for (int i = 0; i < 8; i++) {
+        Metricas::sumarIteracion();
         if (!usadosTerceros[i] && !mismoGrupo(primeros8[idxPrimero], terceros8[i])) {
             usadosTerceros[i] = true;
             partidosTemp[inicioPartidos + idxPrimero] =
@@ -149,6 +161,7 @@ bool Eliminatoria::emparejarPrimerosVsPeoresSegundos(int idxPrimero,
     if (idxPrimero == 4) return true;
 
     for (int i = 0; i < 4; i++) {
+        Metricas::sumarIteracion();
         if (!usadosSegundos[i] && !mismoGrupo(primeros4[idxPrimero], segundos4[i])) {
             usadosSegundos[i] = true;
             partidosTemp[inicioPartidos + idxPrimero] =
@@ -180,12 +193,14 @@ bool Eliminatoria::emparejarSegundosEntreSi(int idx,
     usados[idx] = true;
 
     for (int j = idx + 1; j < 8; j++) {
+        Metricas::sumarIteracion();
         if (!usados[j] && !mismoGrupo(segundos8[idx], segundos8[j])) {
             usados[j] = true;
 
             int realIdx = inicioPartidos;
             while (realIdx < inicioPartidos + 4 &&
                    partidosTemp[realIdx].getEquipoLocal() != 0) {
+                Metricas::sumarIteracion();
                 realIdx++;
             }
 
@@ -259,6 +274,7 @@ void Eliminatoria::mostrarRonda(const string& titulo, Partido* ronda, int cantid
     }
 
     for (int i = 0; i < cantidad; i++) {
+        Metricas::sumarIteracion();
         if (cantidad > 1) {
             cout << "Partido " << i + 1 << ": ";
         }
@@ -278,6 +294,7 @@ void Eliminatoria::jugarRonda(const string& titulo,
     cout << "------------------------------------\n";
 
     for (int i = 0; i < cantidad; i++) {
+        Metricas::sumarIteracion();
         int dia = diaBase + (i / partidosPorDia);
         string fecha = construirFechaEliminatoria(dia, mes);
 
@@ -295,6 +312,7 @@ void Eliminatoria::crearRondaDesdeAnterior(Partido* rondaAnterior,
                                            int mes,
                                            int partidosPorDia) {
     for (int i = 0; i < cantidadNuevaRonda; i++) {
+        Metricas::sumarIteracion();
         Equipo* a = ganadorDe(rondaAnterior[i * 2]);
         Equipo* b = ganadorDe(rondaAnterior[i * 2 + 1]);
 
@@ -311,6 +329,7 @@ void Eliminatoria::crearDesdeGrupos(Equipo* gruposOrdenados[48]) {
     armarClasificados(gruposOrdenados);
 
     for (int i = 0; i < 16; i++) {
+        Metricas::sumarIteracion();
         dieciseisavos[i] = Partido();
     }
 
@@ -327,6 +346,7 @@ void Eliminatoria::crearDesdeGrupos(Equipo* gruposOrdenados[48]) {
                                                  dieciseisavos, 8);
 
     for (int i = 12; i < 16; i++) {
+        Metricas::sumarIteracion();
         dieciseisavos[i] = Partido();
     }
 
@@ -340,6 +360,7 @@ void Eliminatoria::crearDesdeGrupos(Equipo* gruposOrdenados[48]) {
     }
 
     for (int i = 0; i < 16; i++) {
+        Metricas::sumarIteracion();
         string fecha = construirFechaEliminatoria(10 + (i / 4), 7);
         configurarPartido(dieciseisavos[i], fecha);
     }
@@ -358,6 +379,7 @@ void Eliminatoria::mostrarClasificados() {
     cout << "\nPRIMEROS DE GRUPO\n";
     cout << "-----------------\n";
     for (int i = 0; i < 12; i++) {
+        Metricas::sumarIteracion();
         cout << primeros[i].equipo->pais
              << " | Grupo " << primeros[i].grupo
              << " | Pts: " << primeros[i].puntos
@@ -368,6 +390,7 @@ void Eliminatoria::mostrarClasificados() {
     cout << "\nSEGUNDOS DE GRUPO\n";
     cout << "-----------------\n";
     for (int i = 0; i < 12; i++) {
+        Metricas::sumarIteracion();
         cout << segundos[i].equipo->pais
              << " | Grupo " << segundos[i].grupo
              << " | Pts: " << segundos[i].puntos
@@ -378,6 +401,7 @@ void Eliminatoria::mostrarClasificados() {
     cout << "\nMEJORES 8 TERCEROS\n";
     cout << "------------------\n";
     for (int i = 0; i < 8; i++) {
+        Metricas::sumarIteracion();
         cout << mejoresTerceros[i].equipo->pais
              << " | Grupo " << mejoresTerceros[i].grupo
              << " | Pts: " << mejoresTerceros[i].puntos
@@ -429,16 +453,10 @@ Equipo* Eliminatoria::perdedorDe(Partido& p) {
 void Eliminatoria::asegurarGanador(Partido& p, const string& fecha) {
     p.jugar();
 
-    while (p.getGolesLocal() == p.getGolesVisitante()) {
-        Equipo* local = p.getEquipoLocal();
-        Equipo* visitante = p.getEquipoVisitante();
-
-        p = Partido(local, visitante);
-        configurarPartido(p, fecha);
-        p.jugar();
+    if (p.getGolesLocal() == p.getGolesVisitante()) {
+        p.prorroga();
     }
 }
-
 void Eliminatoria::jugarDieciseisavos() {
     if (totalDieciseisavos == 0) {
         cout << "\nPrimero debe crearse la eliminatoria." << endl;

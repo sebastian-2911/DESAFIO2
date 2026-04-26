@@ -37,6 +37,7 @@ public:
     void reiniciarActual();
     void inicializarJugadores();
     Jugador** obtenerAlineacion();
+    Jugador* getJugadorAlineado(int indice);
 };
 
 #endif

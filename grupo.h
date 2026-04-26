@@ -38,10 +38,13 @@ public:
     void crearPartidos();
     void jugarDia(string fecha);
 
+    void mostrarCalendario() const;
+
     void obtenerGruposOrdenados(Equipo* destino[48]);
     void mostrarGrupos();
 
     bool todosLosPartidosJugados() const;
+
 };
 
 #endif
