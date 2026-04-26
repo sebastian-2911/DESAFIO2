@@ -40,6 +40,10 @@ public:
 
     void iniciarFase(Equipo* equipos, int cantidad);
     void iniciarCalendario();
+    bool hayDieciseisavosCreados() const;
+
+    bool hayEliminatoriaJugada() const;
+    int getDiaActual() const;
 
     string construirFechaActual() const;
 

@@ -470,6 +470,18 @@ void Fase::mostrarCalendario() {
     grupos.mostrarCalendario();
 }
 
+bool Fase::hayDieciseisavosCreados() const {
+    return dieciseisavosCreados;
+}
+
+bool Fase::hayEliminatoriaJugada() const {
+    return eliminatoriaJugada;
+}
+
+int Fase::getDiaActual() const {
+    return diaActual;
+}
+
 Fase::Fase(const Fase& otro)
 {
     *this = otro;

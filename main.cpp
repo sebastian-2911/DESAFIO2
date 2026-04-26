@@ -32,7 +32,7 @@ int main() {
     torneo.cargarEquipos("fifa.csv");
 
     if (torneo.getCantidad() != 48) {
-        cout << "No se pudo iniciar el torneo porque se necesitan exactamente 48 equipos." << endl;
+        cout << "Error: se necesitan exactamente 48 equipos." << endl;
         cout << "Equipos cargados: " << torneo.getCantidad() << endl;
         return 1;
     }
@@ -67,8 +67,12 @@ int main() {
             fase.avanzarDia();
 
             {
-                long long memoria = calcularMemoriaTotal(torneo.getEquipos(), torneo.getCantidad())
-                + sizeof(torneo) + sizeof(fase) + sizeof(opcion) + sizeof(linea);
+                long long memoria =
+                    calcularMemoriaTorneo(torneo.getCantidad())
+                    + calcularMemoriaGrupos()
+                    + calcularMemoriaEliminatoria(fase.hayDieciseisavosCreados())
+                    + sizeof(opcion)
+                    + sizeof(linea);
 
                 Metricas::mostrar("Avanzar un dia", memoria);
             }
@@ -80,8 +84,12 @@ int main() {
             torneo.mostrarTodo();
 
             {
-                long long memoria = calcularMemoriaTotal(torneo.getEquipos(), torneo.getCantidad())
-                + sizeof(torneo) + sizeof(fase) + sizeof(opcion) + sizeof(linea);
+                long long memoria =
+                    calcularMemoriaTorneo(torneo.getCantidad())
+                    + calcularMemoriaGrupos()
+                    + calcularMemoriaEliminatoria(fase.hayDieciseisavosCreados())
+                    + sizeof(opcion)
+                    + sizeof(linea);
 
                 Metricas::mostrar("Mostrar todos los equipos", memoria);
             }
@@ -93,8 +101,12 @@ int main() {
             fase.mostrarGrupos();
 
             {
-                long long memoria = calcularMemoriaTotal(torneo.getEquipos(), torneo.getCantidad())
-                + sizeof(torneo) + sizeof(fase) + sizeof(opcion) + sizeof(linea);
+                long long memoria =
+                    calcularMemoriaTorneo(torneo.getCantidad())
+                    + calcularMemoriaGrupos()
+                    + calcularMemoriaEliminatoria(fase.hayDieciseisavosCreados())
+                    + sizeof(opcion)
+                    + sizeof(linea);
 
                 Metricas::mostrar("Mostrar grupos", memoria);
             }
@@ -106,8 +118,12 @@ int main() {
             torneo.mostrarEstadisticasEquipos();
 
             {
-                long long memoria = calcularMemoriaTotal(torneo.getEquipos(), torneo.getCantidad())
-                + sizeof(torneo) + sizeof(fase) + sizeof(opcion) + sizeof(linea);
+                long long memoria =
+                    calcularMemoriaTorneo(torneo.getCantidad())
+                    + calcularMemoriaGrupos()
+                    + calcularMemoriaEliminatoria(fase.hayDieciseisavosCreados())
+                    + sizeof(opcion)
+                    + sizeof(linea);
 
                 Metricas::mostrar("Mostrar estadisticas de equipos", memoria);
             }
@@ -119,8 +135,12 @@ int main() {
             torneo.mostrarEstadisticasJugadores();
 
             {
-                long long memoria = calcularMemoriaTotal(torneo.getEquipos(), torneo.getCantidad())
-                + sizeof(torneo) + sizeof(fase) + sizeof(opcion) + sizeof(linea);
+                long long memoria =
+                    calcularMemoriaTorneo(torneo.getCantidad())
+                    + calcularMemoriaGrupos()
+                    + calcularMemoriaEliminatoria(fase.hayDieciseisavosCreados())
+                    + sizeof(opcion)
+                    + sizeof(linea);
 
                 Metricas::mostrar("Mostrar estadisticas de jugadores", memoria);
             }
@@ -133,8 +153,12 @@ int main() {
             fase.mostrarDieciseisavos();
 
             {
-                long long memoria = calcularMemoriaTotal(torneo.getEquipos(), torneo.getCantidad())
-                + sizeof(torneo) + sizeof(fase) + sizeof(opcion) + sizeof(linea);
+                long long memoria =
+                    calcularMemoriaTorneo(torneo.getCantidad())
+                    + calcularMemoriaGrupos()
+                    + calcularMemoriaEliminatoria(true) // ya se crean aquí
+                    + sizeof(opcion)
+                    + sizeof(linea);
 
                 Metricas::mostrar("Crear y mostrar fase eliminatoria", memoria);
             }
@@ -146,10 +170,14 @@ int main() {
             fase.jugarTodaEliminatoria();
 
             {
-                long long memoria = calcularMemoriaTotal(torneo.getEquipos(), torneo.getCantidad())
-                + sizeof(torneo) + sizeof(fase) + sizeof(opcion) + sizeof(linea);
+                long long memoria =
+                    calcularMemoriaTorneo(torneo.getCantidad())
+                    + calcularMemoriaGrupos()
+                    + calcularMemoriaEliminatoria(true)
+                    + sizeof(opcion)
+                    + sizeof(linea);
 
-                Metricas::mostrar("Jugar toda la eliminatoria", memoria);
+                Metricas::mostrar("Gasto total del sistema", memoria);
             }
             break;
 

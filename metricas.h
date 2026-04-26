@@ -19,5 +19,7 @@ public:
     static void mostrar(const string& nombreFuncionalidad, long long memoria);
 
 };
-long long calcularMemoriaTotal(Equipo* equipos, int cantidadEquipos);
+long long calcularMemoriaTorneo(int cantidadEquipos);
+long long calcularMemoriaGrupos();
+long long calcularMemoriaEliminatoria(bool dieciseisavosCreados);
 #endif
